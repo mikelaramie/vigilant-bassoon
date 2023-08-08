@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dvwa
+spec:
+  selector:
+    matchLabels:
+      app: dvwa
+  template:
+    metadata:
+      labels:
+        app: dvwa
+    spec:
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: web-dvwa
+        image: us-east1-docker.pkg.dev/gke-project-01-05c8c7d8/vulnerable-apps/web-dvwa:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dvwa
+spec:
+  type: LoadBalancer
+  selector:
+    app: dvwa
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
