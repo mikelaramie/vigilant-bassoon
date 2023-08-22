@@ -1,3 +1,6 @@
-project_id  = "example-project-12345"
-region      = "us-east1"
-zone        = "us-east1-b"
+bankofanthos      = true
+enable_cloudarmor = false
+enable_iap        = false
+project_id        = "example-project-12345"
+region            = "us-east1"
+zone              = "us-east1-b"

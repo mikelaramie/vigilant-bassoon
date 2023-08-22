@@ -16,7 +16,7 @@ resource "google_compute_network" "gke-cluster-01-network" {
 /*
 resource "google_compute_firewall" "default" {
     name       = "test-firewall"
-    network    = google_compute_network.gke-project-01-default-network.name
+    network    = google_compute_network.gke-cluster-01-network.name
 
     direction  = "INGRESS"
     allow {
@@ -27,6 +27,7 @@ resource "google_compute_firewall" "default" {
 */
 
 // cluster-01
+// TODO: Remap to use the google kubernetes-engine module
 resource "google_service_account" "gke-cluster-01" {
   account_id   = "gke-cluster-01"
   display_name = "GKE Cluster 01 SA"
@@ -38,7 +39,6 @@ resource "google_project_iam_member" "gke-cluster-01-trace" {
   role    = "roles/cloudtrace.agent"
   member  = "serviceAccount:${google_service_account.gke-cluster-01.email}"
 }
-
 
 resource "google_container_cluster" "gke-cluster-01" {
   name                     = "cluster-01"
