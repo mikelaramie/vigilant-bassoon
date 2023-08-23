@@ -70,6 +70,8 @@ resource "kubernetes_manifest" "iap-backendconfig" {
   }
 }
 
+/* 
 output "bankofanthos-frontend" {
   value = var.bankofanthos ? "http://${data.kubernetes_ingress_v1.bankofanthos[0].status[0].load_balancer[0].ingress[0].ip}" : null
 }
+*/

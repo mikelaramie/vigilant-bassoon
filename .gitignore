@@ -35,3 +35,4 @@ override.tf.json
 # Demo files
 **/bank-of-anthos/*
 **/microservices-demo/*
+wiz-install.txt

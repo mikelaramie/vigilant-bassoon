@@ -4,6 +4,24 @@ variable "bankofanthos" {
   default     = false
 }
 
+variable "create_aoss_java_repository" {
+  type        = bool
+  description = "Deploy the Assured Open Source Software Java repository?  Defaults to false."
+  default     = false
+}
+
+variable "create_aoss_python_repository" {
+  type        = bool
+  description = "Deploy the Assured Open Source Software Python repository?  Defaults to false."
+  default     = false
+}
+
+variable "create_bankofanthos_repository" {
+  type        = bool
+  description = "Deploy the Bank of Anthos repository?  Defaults to false."
+  default     = false
+}
+
 variable "enable_cloudarmor" {
   type        = bool
   description = "Boolean to enable/disable Cloud Armor on the Bank of Anthos application.  Defaults to false."

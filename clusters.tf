@@ -13,20 +13,6 @@ resource "google_compute_network" "gke-cluster-01-network" {
   depends_on              = [google_project_service.gcp_gke_services]
 }
 
-/*
-resource "google_compute_firewall" "default" {
-    name       = "test-firewall"
-    network    = google_compute_network.gke-cluster-01-network.name
-
-    direction  = "INGRESS"
-    allow {
-      protocol = "tcp"
-      ports = ["22"]
-    }
-    source_ranges = ["0.0.0.0/0"]
-*/
-
-// cluster-01
 // TODO: Remap to use the google kubernetes-engine module
 resource "google_service_account" "gke-cluster-01" {
   account_id   = "gke-cluster-01"
@@ -67,22 +53,13 @@ resource "google_container_node_pool" "gke-project-01-cluster-01-pool-01" {
 
   autoscaling {
     min_node_count = 2
-    max_node_count = 5
+    max_node_count = 3
   }
 
   node_config {
-    preemptible  = true //set to false if you want stable hosts
-    machine_type = "e2-standard-4"
-    /*
-    "e2-standard-4" allows for a suitable number of CPUs to run both the LW agent and
-    the Bank of Anthos demo environment.  For a full list of available machine types
-    visit https://cloud.google.com/compute/docs/machine-types    
-    */
-    image_type = "cos_containerd"
-    /* Available Linux options are "cos", "cos_containerd", "ubuntu", "ubuntu_containerd" 
-    For more info (including Windows options) visit
-    https://cloud.google.com/kubernetes-engine/docs/concepts/node-images
-    */
+    preemptible     = false //set to false if you want stable hosts
+    machine_type    = "e2-standard-4"
+    image_type      = "cos_containerd"
     service_account = google_service_account.gke-cluster-01.email
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"

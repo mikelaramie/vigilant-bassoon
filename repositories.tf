@@ -1,18 +1,20 @@
 // Check for appropriate APIs enabled
 resource "google_project_service" "gcp-gar-services" {
-  for_each           = toset(var.gcp_gar_service_list)
-  service            = each.key
+  count              = (var.create_aoss_java_repository || var.create_aoss_python_repository || var.create_bankofanthos_repository) ? length(var.gcp_gar_service_list) : 0
+  service            = element(var.gcp_gar_service_list, count.index)
   disable_on_destroy = false
 }
 
 // Bank of Anthos Repo
 data "google_artifact_registry_repository" "google-boa-repository" {
+  count         = var.create_bankofanthos_repository ? 1 : 0
   project       = "bank-of-anthos-ci"
   location      = "us-central1"
   repository_id = "bank-of-anthos"
 }
 
 resource "google_artifact_registry_repository" "boa-repository" {
+  count         = var.create_bankofanthos_repository ? 1 : 0
   location      = var.region
   repository_id = "bank-of-anthos"
   description   = "Mirror of Google's Bank of Anthos Repository"
@@ -21,7 +23,7 @@ resource "google_artifact_registry_repository" "boa-repository" {
   virtual_repository_config {
     upstream_policies {
       id         = "bank-of-anthos-upstream"
-      repository = data.google_artifact_registry_repository.google-boa-repository.id
+      repository = data.google_artifact_registry_repository.google-boa-repository[0].id
       //repository = "projects/bank-of-anthos-ci/locations/us-central1/repositories/bank-of-anthos"
       priority = 1
     }
@@ -30,14 +32,15 @@ resource "google_artifact_registry_repository" "boa-repository" {
 }
 
 resource "google_artifact_registry_repository_iam_member" "boa-member" {
-  location   = google_artifact_registry_repository.boa-repository.location
-  repository = google_artifact_registry_repository.boa-repository.name
+  count      = var.create_bankofanthos_repository ? 1 : 0
+  location   = google_artifact_registry_repository.boa-repository[0].location
+  repository = google_artifact_registry_repository.boa-repository[0].name
   role       = "roles/artifactregistry.reader"
   member     = "serviceAccount:${google_service_account.gke-cluster-01.email}"
 }
 
 output "boa-repository-uri" {
-  value = google_artifact_registry_repository.boa-repository.id
+  value = var.create_bankofanthos_repository ? google_artifact_registry_repository.boa-repository[0].id : null
 }
 
 
@@ -79,6 +82,7 @@ output "ob-repository-uri" {
 
 // AOSS Java Repo
 resource "google_artifact_registry_repository" "aoss-java-repository" {
+  count         = var.create_aoss_java_repository ? 1 : 0
   location      = "us"
   repository_id = "aoss-java"
   description   = "Pullthrough of Google's AOSS Java Repository"
@@ -95,18 +99,20 @@ resource "google_artifact_registry_repository" "aoss-java-repository" {
 }
 
 resource "google_artifact_registry_repository_iam_member" "aoss-java-member" {
-  location   = google_artifact_registry_repository.aoss-java-repository.location
-  repository = google_artifact_registry_repository.aoss-java-repository.name
+  count      = var.create_aoss_java_repository ? 1 : 0
+  location   = google_artifact_registry_repository.aoss-java-repository[0].location
+  repository = google_artifact_registry_repository.aoss-java-repository[0].name
   role       = "roles/artifactregistry.reader"
   member     = "serviceAccount:${google_service_account.gke-cluster-01.email}"
 }
 
 output "aoss-java-repository-uri" {
-  value = google_artifact_registry_repository.aoss-java-repository.id
+  value = var.create_aoss_java_repository ? google_artifact_registry_repository.aoss-java-repository[0].id : null
 }
 
 // AOSS Python Repo
 resource "google_artifact_registry_repository" "aoss-python-repository" {
+  count         = var.create_aoss_python_repository ? 1 : 0
   location      = "us"
   repository_id = "aoss-python"
   description   = "Pullthrough of Google's AOSS Python Repository"
@@ -123,12 +129,13 @@ resource "google_artifact_registry_repository" "aoss-python-repository" {
 }
 
 resource "google_artifact_registry_repository_iam_member" "aoss-python-member" {
-  location   = google_artifact_registry_repository.aoss-python-repository.location
-  repository = google_artifact_registry_repository.aoss-python-repository.name
+  count      = var.create_aoss_python_repository ? 1 : 0
+  location   = google_artifact_registry_repository.aoss-python-repository[0].location
+  repository = google_artifact_registry_repository.aoss-python-repository[0].name
   role       = "roles/artifactregistry.reader"
   member     = "serviceAccount:${google_service_account.gke-cluster-01.email}"
 }
 
 output "aoss-python-repository-uri" {
-  value = google_artifact_registry_repository.aoss-python-repository.id
+  value = var.create_aoss_python_repository ? google_artifact_registry_repository.aoss-python-repository[0].id : null
 }
