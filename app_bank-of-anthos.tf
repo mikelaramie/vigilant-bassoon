@@ -1,5 +1,4 @@
 // Deploy Bank of Anthos
-// TODO - Make this a module
 
 resource "kubernetes_namespace" "bankofanthos" {
   count      = var.bankofanthos ? 1 : 0
@@ -9,30 +8,11 @@ resource "kubernetes_namespace" "bankofanthos" {
   }
 }
 
-resource "kubectl_manifest" "bankofanthos-secret" {
-  count              = var.bankofanthos ? 1 : 0
-  yaml_body          = file("${path.module}/helpers/bank-of-anthos/extras/jwt/jwt-secret.yaml")
-  override_namespace = kubernetes_namespace.bankofanthos[0].metadata[0].name
-}
-
-data "kubectl_path_documents" "bankofanthos-manifests" {
-  count   = var.bankofanthos ? 1 : 0
-  pattern = "./helpers/bank-of-anthos/kubernetes-manifests/*.yaml"
-}
-
-resource "kubectl_manifest" "bankofanthos" {
-  count              = var.bankofanthos ? length(data.kubectl_path_documents.bankofanthos-manifests[0].documents) : 0
-  depends_on         = [kubectl_manifest.bankofanthos-secret[0]]
-  yaml_body          = element(data.kubectl_path_documents.bankofanthos-manifests[0].documents, count.index)
-  override_namespace = kubernetes_namespace.bankofanthos[0].metadata[0].name
-}
-
-data "kubernetes_ingress_v1" "bankofanthos" {
-  count = var.bankofanthos ? 1 : 0
-  metadata {
-    name      = "frontend-ingress"
-    namespace = kubernetes_namespace.bankofanthos[0].metadata[0].name
-  }
+module "bankofanthos" {
+  // DO NOT USE THIS YET :(
+  count     = 0 //var.bankofanthos ? 1 : 0
+  source    = "./modules/bankofanthos"
+  namespace = kubernetes_namespace.bankofanthos[0].metadata[0].name
 }
 
 // Add IAP
