@@ -4,6 +4,12 @@ variable "bankofanthos" {
   default     = false
 }
 
+variable "bankofanthos_namespace" {
+  type = string
+  description = "Namespace to deploy the Bank of Anthos app to"
+  default = "bankofanthos"
+}
+
 variable "create_aoss_java_repository" {
   type        = bool
   description = "Deploy the Assured Open Source Software Java repository?  Defaults to false."
